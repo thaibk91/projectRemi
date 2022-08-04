@@ -5,6 +5,7 @@ import { loginStart, loginSuccess, loginFailure } from "../redux/userSlice";
 import { auth, provider } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
@@ -70,9 +71,12 @@ const Link = styled.span`
 
 const SignIn = () => {
   const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
+  const [email, setEmailSignUp] = useState("")
+  const [nameSignUp, setNameSignUp] = useState("")
+  const [passwordSignUp, setPasswordSignUp] = useState("")
   const [password, setPassword] = useState("")
 
+  const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const handleLogin = async (e) => {
@@ -81,6 +85,22 @@ const SignIn = () => {
     try {
       const res = await axios.post("/auth/signin", {name, password})
       dispatch(loginSuccess(res.data))
+      navigate(`/`)
+    } catch (err) {
+      dispatch(loginFailure())
+    }
+  }
+
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    dispatch(loginStart())
+    try {
+      const res = await axios.post("/auth/signup", {name: nameSignUp, email, password: passwordSignUp})
+      if(res) {
+        const resLogin = await axios.post("/auth/signin", {name: nameSignUp, password: passwordSignUp})
+        dispatch(loginSuccess(resLogin.data))
+        navigate(`/`)
+      }
     } catch (err) {
       dispatch(loginFailure())
     }
@@ -96,6 +116,7 @@ const SignIn = () => {
           img: result.user.photoURL,
       })
       dispatch(loginSuccess(res.data));
+      navigate(`/`)
     })
     .catch((error) => {
       dispatch(loginFailure());
@@ -113,10 +134,10 @@ const SignIn = () => {
         <Title>or</Title>
         <Button onClick={signInWithGoogle}>Sign in with Google</Button>
         <Title>or</Title>
-        <Input placeholder="username" onChange={e=>setName(e.target.value)}/>
-        <Input placeholder="email" onChange={e=>setEmail(e.target.value)}/>
-        <Input type="password" placeholder="password" onChange={e=>setPassword(e.target.value)}/>
-        <Button>Sign up</Button>
+        <Input placeholder="username" onChange={e=>setNameSignUp(e.target.value)}/>
+        <Input placeholder="email" onChange={e=>setEmailSignUp(e.target.value)}/>
+        <Input type="password" placeholder="password" onChange={e=>setPasswordSignUp(e.target.value)}/>
+        <Button onClick={handleSignUp}>Sign up</Button>
       </Wrapper>
       <More>
         English(USA)

@@ -6,6 +6,7 @@ import VideoCallIcon from '@mui/icons-material/VideoCall';
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Upload from "./Upload";
+import Logout from "./LogOut";
 
 const Container = styled.div`
   position: sticky;
@@ -35,13 +36,13 @@ const Search = styled.div`
   padding: 5px;
   border: 1px solid #ccc;
   border-radius: 3px;
+  color: ${({ theme }) => theme.text};
 `;
 
 const Input = styled.input`
   border: none;
   background-color: transparent;
   outline: none;
-  color: ${({ theme }) => theme.text};
 `;
 
 const Button = styled.button`
@@ -74,7 +75,9 @@ const Avatar = styled.img`
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [logout, setLogOut] = useState(false);
   const { currentUser } = useSelector(state=> state.user);
+  
   
   return (
     <>
@@ -85,7 +88,7 @@ const Navbar = () => {
             <SearchOutlinedIcon />
           </Search>
           {currentUser ? 
-            <User>
+            <User onClick={() => {setLogOut(true)}}>
               <VideoCallIcon onClick={() => {setOpen(true)}} />
               <Avatar src={currentUser.img}/>
               {currentUser.name}
@@ -98,6 +101,7 @@ const Navbar = () => {
             </Link>}
         </Wrapper>
       </Container>
+      {logout && <Logout setLogOut={setLogOut} />}
       {open && <Upload setOpen={setOpen} />}
     </>
   );
